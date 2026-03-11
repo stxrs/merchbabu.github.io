@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MerchBabu – For Telugu Yuvatha</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    :root{--black:#0a0a0a;--white:#f5f0e8;--accent:#e8320a;--gold:#d4a017;--dark:#111;--card:#1a1a1a;--border:#2a2a2a;--muted:#888;--green:#22c55e;--yellow:#facc15;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{background:var(--black);color:var(--white);font-family:'Rajdhani',sans-serif;overflow-x:hidden;}
+
+    .announce{background:var(--accent);text-align:center;padding:9px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+
+    nav{display:flex;align-items:center;justify-content:space-between;padding:14px 40px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:rgba(10,10,10,.96);backdrop-filter:blur(12px);}
+    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .nav-logo img{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);}
+    .nav-logo-text{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--white);letter-spacing:3px;}
+    .nav-links{display:flex;gap:28px;list-style:none;}
+    .nav-links a{color:var(--white);text-decoration:none;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;transition:color .2s;position:relative;}
+    .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:var(--accent);transition:width .3s;}
+    .nav-links a:hover{color:var(--accent);}
+    .nav-links a:hover::after{width:100%;}
+    .nav-icons{display:flex;gap:18px;align-items:center;}
+    .nav-icon-btn{background:none;border:none;color:var(--white);cursor:pointer;font-size:20px;transition:color .2s;position:relative;}
+    .nav-icon-btn:hover{color:var(--accent);}
+    .cart-count{position:absolute;top:-8px;right:-8px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+
+    .hero{position:relative;height:92vh;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+    .hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,rgba(232,50,10,.15) 0%,transparent 50%),linear-gradient(to bottom,transparent 40%,rgba(10,10,10,.95) 100%),url('https://merchbabu1.myshopify.com/cdn/shop/files/WhatsApp_Image_2026-01-26_at_21.47.13.jpg?v=1769444368&width=1920') center/cover no-repeat;}
+    .hero-content{position:relative;z-index:2;text-align:center;animation:fadeUp 1s ease forwards;}
+    .hero-logo-img{width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid var(--accent);margin-bottom:18px;box-shadow:0 0 40px rgba(232,50,10,.4);}
+    .hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(60px,10vw,120px);letter-spacing:8px;line-height:.9;text-shadow:0 0 60px rgba(232,50,10,.3);}
+    .hero-sub{font-size:15px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin:14px 0 8px;font-weight:700;}
+    .hero-tag{font-size:12px;letter-spacing:2px;color:var(--muted);margin-bottom:36px;text-transform:uppercase;}
+    .btn-primary{display:inline-block;background:var(--accent);color:#fff;padding:13px 38px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:3px;text-decoration:none;text-transform:uppercase;transition:all .3s;border:2px solid var(--accent);cursor:pointer;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);}
+    .btn-primary:hover{background:transparent;color:var(--accent);}
+
+    .ticker-wrap{overflow:hidden;background:var(--accent);padding:9px 0;white-space:nowrap;}
+    .ticker-inner{display:inline-block;animation:ticker 28s linear infinite;}
+    .ticker-inner span{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:4px;margin:0 36px;}
+    @keyframes ticker{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+    .philosophy{display:grid;grid-template-columns:1fr 1fr;min-height:65vh;}
+    .philosophy-img{overflow:hidden;}
+    .philosophy-img img{width:100%;height:100%;object-fit:cover;transition:transform .6s;}
+    .philosophy-img:hover img{transform:scale(1.04);}
+    .philosophy-text{background:var(--dark);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px;text-align:center;border-left:1px solid var(--border);}
+    .philosophy-text h2{font-family:'Bebas Neue',sans-serif;font-size:50px;letter-spacing:4px;line-height:1.1;margin-bottom:18px;}
+    .philosophy-text h2 span{color:var(--accent);}
+    .philosophy-text p{font-size:14px;color:var(--muted);letter-spacing:1px;line-height:1.8;margin-bottom:28px;}
+
+    .disc-offers{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);}
+    .disc-offer{background:var(--dark);padding:24px 20px;text-align:center;}
+    .disc-offer .icon{font-size:28px;margin-bottom:8px;}
+    .disc-offer h4{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--gold);margin-bottom:4px;}
+    .disc-offer p{font-size:12px;color:var(--muted);letter-spacing:.5px;}
+    .disc-offer code{font-size:14px;font-weight:700;color:var(--accent);background:var(--black);padding:2px 8px;border:1px dashed var(--accent);margin-top:6px;display:inline-block;letter-spacing:2px;cursor:pointer;}
+    .disc-offer code:hover{background:var(--accent);color:#fff;}
+
+    .sec-header{display:flex;align-items:center;justify-content:space-between;padding:56px 40px 28px;border-bottom:1px solid var(--border);}
+    .sec-title{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:4px;}
+    .sec-title span{color:var(--accent);}
+    .view-all{color:var(--accent);text-decoration:none;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid var(--accent);padding-bottom:2px;transition:opacity .2s;}
+    .view-all:hover{opacity:.7;}
+
+    .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1px;background:var(--border);}
+    .product-card{background:var(--black);overflow:hidden;cursor:pointer;transition:background .2s;}
+    .product-card:hover{background:var(--card);}
+    .product-img-wrap{position:relative;overflow:hidden;aspect-ratio:3/4;}
+    .product-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .5s;}
+    .product-card:hover .product-img-wrap img{transform:scale(1.06);}
+    .img-alt{position:absolute;inset:0;opacity:0;transition:opacity .4s;}
+    .product-card:hover .img-alt{opacity:1;}
+    .product-badge{position:absolute;top:10px;left:10px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;letter-spacing:1.5px;padding:3px 10px;text-transform:uppercase;z-index:2;}
+    .product-info{padding:14px 18px 18px;}
+    .product-name{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+    .product-price{font-family:'Bebas Neue',sans-serif;font-size:21px;color:var(--gold);}
+    .card-sizes{display:flex;gap:5px;margin:10px 0 0;flex-wrap:wrap;}
+    .card-size{width:34px;height:34px;background:transparent;border:1px solid var(--border);color:var(--white);font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;}
+    .card-size:hover,.card-size.sel{border-color:var(--accent);background:var(--accent);color:#fff;}
+    .card-add{width:100%;margin-top:10px;background:var(--accent);color:#fff;border:none;padding:10px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;}
+    .card-add:hover{background:#c02a08;}
+    .card-add:disabled{background:var(--border);cursor:not-allowed;color:var(--muted);}
+
+    .col-banner{position:relative;height:260px;overflow:hidden;display:flex;align-items:center;justify-content:center;border-top:1px solid var(--border);}
+    .col-banner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.4);transition:transform .6s;}
+    .col-banner:hover img{transform:scale(1.04);}
+    .col-banner-content{position:relative;z-index:2;text-align:center;}
+    .col-banner-title{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:6px;}
+    .col-banner-sub{font-size:11px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:16px;}
+
+    .featured{display:grid;grid-template-columns:1fr 1fr;min-height:58vh;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+    .featured-img{overflow:hidden;}
+    .featured-img img{width:100%;height:100%;object-fit:cover;}
+    .featured-info{padding:56px;display:flex;flex-direction:column;justify-content:center;background:var(--dark);}
+    .featured-tag{font-size:11px;font-weight:700;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:10px;}
+    .featured-title{font-family:'Bebas Neue',sans-serif;font-size:46px;letter-spacing:4px;line-height:1;margin-bottom:14px;}
+    .featured-desc{font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:22px;}
+    .featured-price{font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--gold);margin-bottom:28px;}
+    .size-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+    .size-options{display:flex;gap:7px;margin-bottom:22px;flex-wrap:wrap;}
+    .sz-btn{width:40px;height:40px;background:transparent;border:1px solid var(--border);color:var(--white);font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;}
+    .sz-btn:hover,.sz-btn.active{border-color:var(--accent);background:var(--accent);color:#fff;}
+
+    /* CART DRAWER */
+    .cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s;}
+    .cart-overlay.open{opacity:1;pointer-events:all;}
+    .cart-drawer{position:fixed;top:0;right:0;width:430px;height:100%;background:var(--dark);z-index:201;transform:translateX(100%);transition:transform .4s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+    .cart-drawer.open{transform:translateX(0);}
+    .cart-head{display:flex;justify-content:space-between;align-items:center;padding:22px 24px;border-bottom:1px solid var(--border);flex-shrink:0;}
+    .cart-head h3{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;}
+    .cart-close-btn{background:none;border:none;color:var(--white);font-size:22px;cursor:pointer;}
+    .cart-body{flex:1;overflow-y:auto;padding:20px 24px;}
+    .cart-empty-msg{text-align:center;padding:60px 0;color:var(--muted);}
+    .cart-empty-msg p{font-size:15px;margin-bottom:20px;}
+    .cart-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);}
+    .cart-item img{width:68px;height:85px;object-fit:cover;flex-shrink:0;}
+    .cart-item-info{flex:1;min-width:0;}
+    .cart-item-name{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .cart-item-size{font-size:11px;color:var(--muted);margin-bottom:4px;letter-spacing:1px;}
+    .cart-item-price{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);}
+    .cart-item-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
+    .qty-wrap{display:flex;align-items:center;gap:10px;}
+    .qty-btn{width:26px;height:26px;background:var(--border);border:none;color:var(--white);cursor:pointer;font-size:15px;transition:background .2s;}
+    .qty-btn:hover{background:var(--accent);}
+    .qty-num{font-weight:700;font-size:14px;min-width:16px;text-align:center;}
+    .remove-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;transition:color .2s;}
+    .remove-btn:hover{color:var(--accent);}
+
+    /* DISCOUNT BOX */
+    .discount-box{background:var(--black);border:1px solid var(--border);padding:16px;margin-bottom:16px;}
+    .discount-box h4{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;color:var(--muted);}
+    .disc-row{display:flex;gap:8px;}
+    .discount-input{flex:1;background:transparent;border:1px solid var(--border);color:var(--white);padding:9px 12px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;outline:none;text-transform:uppercase;letter-spacing:1px;}
+    .discount-input:focus{border-color:var(--accent);}
+    .discount-input::placeholder{color:var(--muted);text-transform:none;}
+    .btn-apply{background:var(--dark);color:var(--white);border:1px solid var(--border);padding:9px 16px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;text-transform:uppercase;transition:all .2s;white-space:nowrap;}
+    .btn-apply:hover{border-color:var(--accent);color:var(--accent);}
+    .discount-msg{margin-top:8px;font-size:12px;font-weight:700;letter-spacing:.5px;}
+    .discount-msg.ok{color:var(--green);}
+    .discount-msg.err{color:var(--accent);}
+
+    /* CART SUMMARY */
+    .cart-summary{padding:20px 24px;border-top:1px solid var(--border);background:var(--black);flex-shrink:0;}
+    .summary-row{display:flex;justify-content:space-between;font-size:14px;font-weight:600;margin-bottom:8px;letter-spacing:.5px;}
+    .summary-row.total-row{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;border-top:1px solid var(--border);padding-top:12px;margin-top:4px;}
+    .btn-checkout{width:100%;background:var(--accent);color:#fff;border:none;padding:16px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;cursor:pointer;transition:background .2s;margin-top:14px;}
+    .btn-checkout:hover{background:#c02a08;}
+    .secure-note{text-align:center;font-size:11px;color:var(--muted);margin-top:10px;letter-spacing:.5px;}
+
+    /* CHECKOUT MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;padding:20px;}
+    .modal-overlay.open{opacity:1;pointer-events:all;}
+    .modal{background:var(--dark);border:1px solid var(--border);width:480px;max-width:100%;max-height:90vh;overflow-y:auto;padding:36px;position:relative;animation:fadeUp .3s ease;}
+    .modal h3{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:3px;margin-bottom:6px;}
+    .modal>p{font-size:13px;color:var(--muted);margin-bottom:22px;}
+    .form-group{margin-bottom:15px;}
+    .form-group label{display:block;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+    .form-input{width:100%;background:var(--black);border:1px solid var(--border);color:var(--white);padding:11px 14px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;outline:none;transition:border-color .2s;}
+    .form-input:focus{border-color:var(--accent);}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--white);font-size:20px;cursor:pointer;}
+    .test-info{background:var(--black);border:1px solid var(--yellow);padding:14px;margin-bottom:16px;}
+    .test-info h5{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--yellow);margin-bottom:8px;}
+    .test-info p{font-size:12px;color:var(--muted);margin-bottom:4px;font-family:monospace;}
+    .test-info p span{color:var(--white);}
+    .rzp-note{display:flex;align-items:center;gap:8px;background:var(--black);border:1px solid var(--border);padding:12px;margin:14px 0;font-size:12px;color:var(--muted);}
+    .rzp-badge{background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;letter-spacing:1px;flex-shrink:0;}
+
+    /* SUCCESS */
+    .success-modal{background:var(--dark);border:1px solid var(--green);width:420px;max-width:100%;padding:40px;text-align:center;animation:fadeUp .4s ease;}
+    .success-icon{font-size:60px;margin-bottom:16px;}
+    .success-modal h3{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:4px;color:var(--green);margin-bottom:8px;}
+    .success-modal p{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:6px;}
+    .order-id{font-family:monospace;font-size:12px;color:var(--gold);margin:12px 0 24px;background:var(--black);padding:8px;border:1px solid var(--border);word-break:break-all;}
+
+    footer{background:#070707;padding:56px 40px 28px;border-top:1px solid var(--border);}
+    .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:56px;margin-bottom:36px;}
+    .footer-logo{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:4px;}
+    .footer-brand p{font-size:13px;color:var(--muted);line-height:1.7;margin-top:10px;}
+    .footer-col h4{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:14px;}
+    .footer-col ul{list-style:none;}
+    .footer-col ul li{margin-bottom:9px;}
+    .footer-col ul li a{color:var(--muted);text-decoration:none;font-size:14px;transition:color .2s;}
+    .footer-col ul li a:hover{color:var(--white);}
+    .footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:28px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);}
+
+    .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--dark);border:1px solid var(--accent);color:var(--white);padding:13px 26px;font-size:14px;font-weight:600;letter-spacing:1px;z-index:500;transition:transform .35s cubic-bezier(.4,0,.2,1);white-space:nowrap;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
+    .fade-in{opacity:0;transform:translateY(18px);transition:opacity .6s,transform .6s;}
+    .fade-in.visible{opacity:1;transform:translateY(0);}
+
+    @media(max-width:768px){
+      nav{padding:12px 16px;}
+      .nav-links{display:none;}
+      .philosophy,.featured{grid-template-columns:1fr;}
+      .philosophy-text,.featured-info{padding:36px 20px;}
+      .sec-header{padding:36px 16px 20px;}
+      .products-grid{grid-template-columns:repeat(2,1fr);}
+      .footer-grid{grid-template-columns:1fr;gap:28px;}
+      .cart-drawer{width:100%;}
+      .disc-offers{grid-template-columns:1fr;}
+      .form-row{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="announce">🔥 Use <strong>BABU10</strong> for 10% OFF · Free Shipping above ₹999 · COD Available · New Drops Every Week 🔥</div>
+
+<nav>
+  <a href="#" class="nav-logo">
+    <img src="https://merchbabu1.myshopify.com/cdn/shop/files/website_pfp.png?v=1769443729" alt="MerchBabu"/>
+    <span class="nav-logo-text">MERCHBABU</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#home">Home</a></li>
+    <li><a href="#catalog">Catalog</a></li>
+    <li><a href="#collections">Collections</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-icons">
+    <button class="nav-icon-btn">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    </button>
+    <button class="nav-icon-btn">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </button>
+    <button class="nav-icon-btn" id="cartBtn">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <span class="cart-count" id="cartCount">0</span>
+    </button>
+  </div>
+</nav>
+
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <img src="https://merchbabu1.myshopify.com/cdn/shop/files/website_pfp.png?v=1769443729" class="hero-logo-img" alt="MerchBabu"/>
+    <h1 class="hero-title">MERCH<br>BABU</h1>
+    <p class="hero-sub">For Telugu Yuvatha · By Telugu Yuvatha</p>
+    <p class="hero-tag">Ee Tshirt's evvadu veskuntado vade pandu gadu</p>
+    <a href="#catalog" class="btn-primary">Shop Now</a>
+  </div>
+</section>
+
+<div class="ticker-wrap">
+  <div class="ticker-inner">
+    <span>MAHESH BABU</span><span>✦</span><span>ALLU ARJUN</span><span>✦</span><span>ANIRUDH</span><span>✦</span><span>BRAHMI</span><span>✦</span><span>VIRAT KOHLI</span><span>✦</span><span>USTAAD COLLECTION</span><span>✦</span><span>NEW DROPS</span><span>✦</span><span>MAHESH BABU</span><span>✦</span><span>ALLU ARJUN</span><span>✦</span><span>ANIRUDH</span><span>✦</span><span>BRAHMI</span><span>✦</span><span>VIRAT KOHLI</span><span>✦</span><span>USTAAD COLLECTION</span><span>✦</span><span>NEW DROPS</span><span>✦</span>
+  </div>
+</div>
+
+<section class="philosophy">
+  <div class="philosophy-img"><img src="https://merchbabu1.myshopify.com/cdn/shop/files/WhatsApp_Image_2026-01-26_at_21.48.43.jpg?v=1769444533" alt=""/></div>
+  <div class="philosophy-text">
+    <h2><span>OUR</span><br>PHILOSOPHY</h2>
+    <p>Born from the streets of Andhra & Telangana.<br>Designed for those who bleed Telugu pride.<br>Every tee tells a story — of icons, legends, and culture.</p>
+    <a href="#catalog" class="btn-primary">Explore Collection</a>
+  </div>
+</section>
+
+<!-- DISCOUNT OFFERS -->
+<div class="disc-offers fade-in">
+  <div class="disc-offer">
+    <div class="icon">🏷️</div><h4>10% OFF</h4><p>On your first order</p>
+    <code onclick="copyCode('BABU10')" title="Click to copy">BABU10</code>
+  </div>
+  <div class="disc-offer">
+    <div class="icon">🛒</div><h4>FLAT ₹100 OFF</h4><p>On orders above ₹1500</p>
+    <code onclick="copyCode('SAVE100')" title="Click to copy">SAVE100</code>
+  </div>
+  <div class="disc-offer">
+    <div class="icon">🎉</div><h4>20% OFF</h4><p>On 3 or more items</p>
+    <code onclick="copyCode('GANG20')" title="Click to copy">GANG20</code>
+  </div>
+</div>
+
+<div class="sec-header fade-in" id="catalog">
+  <h2 class="sec-title">BEST<span>SELLERS</span></h2>
+  <a href="#catalog" class="view-all">View All →</a>
+</div>
+<div class="products-grid" id="grid-bestsellers"></div>
+
+<div class="featured fade-in">
+  <div class="featured-img"><img src="https://merchbabu1.myshopify.com/cdn/shop/files/ANI_POST_2.png?v=1771957402" alt="Anirudh"/></div>
+  <div class="featured-info">
+    <p class="featured-tag">✦ Limited Edition Drop</p>
+    <h2 class="featured-title">ANIRUDH TEE</h2>
+    <p class="featured-desc">100% cotton · 240 GSM heavyweight · Unisex oversized fit.<br>Crafted for fans who know music is not just heard — it's felt.</p>
+    <p class="featured-price">₹650</p>
+    <p class="size-label">Select Size</p>
+    <div class="size-options" id="featuredSizes">
+      <button class="sz-btn" onclick="featSz(this)">S</button>
+      <button class="sz-btn active" onclick="featSz(this)">M</button>
+      <button class="sz-btn" onclick="featSz(this)">L</button>
+      <button class="sz-btn" onclick="featSz(this)">XL</button>
+      <button class="sz-btn" onclick="featSz(this)">XXL</button>
+    </div>
+    <button class="btn-primary" onclick="addFeaturedToCart()">Add to Cart</button>
+  </div>
+</div>
+
+<div id="collections">
+  <div class="col-banner"><img src="https://merchbabu1.myshopify.com/cdn/shop/files/USTAAD_POSSTT_1.png?v=1771739695" alt="Ustaad"/><div class="col-banner-content"><p class="col-banner-sub">New Collection</p><h2 class="col-banner-title">USTAAD COLLECTION</h2></div></div>
+  <div class="sec-header fade-in"><h2 class="sec-title">USTAAD <span>COLLECTION</span></h2></div>
+  <div class="products-grid" id="grid-ustaad"></div>
+
+  <div class="col-banner" style="margin-top:1px;"><img src="https://merchbabu1.myshopify.com/cdn/shop/files/Front_1_c_2_367c2fd0-3004-4555-8693-fdb790394cd0.jpg?v=1769242666" alt="Mahesh Babu"/><div class="col-banner-content"><p class="col-banner-sub">Signature Series</p><h2 class="col-banner-title">MAHESH BABU</h2></div></div>
+  <div class="sec-header fade-in"><h2 class="sec-title">MAHESH <span>BABU</span></h2><a href="#" class="view-all">View All →</a></div>
+  <div class="products-grid" id="grid-mahesh"></div>
+
+  <div class="sec-header fade-in" style="margin-top:1px;"><h2 class="sec-title">COMIC <span>COLLECTION</span></h2></div>
+  <div class="products-grid" id="grid-comic"></div>
+
+  <div class="sec-header fade-in"><h2 class="sec-title">CRICKETERS <span>COLLECTION</span></h2></div>
+  <div class="products-grid" id="grid-cricket"></div>
+
+  <div class="sec-header fade-in"><h2 class="sec-title">STICKERS <span>& MORE</span></h2></div>
+  <div class="products-grid" id="grid-stickers"></div>
+</div>
+
+<footer id="contact">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="footer-logo">MERCHBABU</div>
+      <p>Telugu pop culture merch, crafted with love.<br>For the fans, by the fans.<br>Proudly made in Andhra Pradesh & Telangana. 🇮🇳</p>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul><li><a href="#">Home</a></li><li><a href="#">Catalog</a></li><li><a href="#">New Arrivals</a></li><li><a href="#">About Us</a></li><li><a href="#">Contact</a></li></ul>
+    </div>
+    <div class="footer-col">
+      <h4>Policies</h4>
+      <ul><li><a href="#">Privacy Policy</a></li><li><a href="#">Shipping Policy</a></li><li><a href="#">Returns & Refunds</a></li><li><a href="#">Terms of Service</a></li></ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 MerchBabu. All rights reserved.</span>
+    <span>Payments secured by Razorpay 🔒</span>
+  </div>
+</footer>
+
+<!-- CART -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-head">
+    <h3>YOUR CART (<span id="cartItemCount">0</span>)</h3>
+    <button class="cart-close-btn" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-body" id="cartBody"></div>
+  <div id="cartFooter" style="display:none;">
+    <div style="padding:0 24px 0;">
+      <div class="discount-box">
+        <h4>🏷️ Discount Code</h4>
+        <div class="disc-row">
+          <input type="text" class="discount-input" id="discountInput" placeholder="e.g. BABU10, GANG20" maxlength="20"/>
+          <button class="btn-apply" onclick="applyDiscount()">Apply</button>
+        </div>
+        <div class="discount-msg" id="discountMsg"></div>
+        <div style="margin-top:8px;font-size:11px;color:var(--muted);">Available: BABU10 · SAVE100 · GANG20 · TELUGU15</div>
+      </div>
+    </div>
+    <div class="cart-summary">
+      <div class="summary-row"><span>Subtotal</span><span id="subtotalDisplay">₹0</span></div>
+      <div class="summary-row" id="discountRow" style="display:none;color:var(--green);"><span id="discountLabel">Discount</span><span id="discountAmount">-₹0</span></div>
+      <div class="summary-row"><span>Shipping</span><span id="shippingDisplay">₹0</span></div>
+      <div class="summary-row total-row"><span>TOTAL</span><span id="totalDisplay">₹0</span></div>
+      <button class="btn-checkout" onclick="openCheckout()">PAY WITH RAZORPAY</button>
+      <p class="secure-note">🔒 UPI · Cards · Net Banking · Wallets · EMI</p>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-overlay" id="checkoutModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeCheckout()">✕</button>
+    <h3>CHECKOUT</h3>
+    <p>Fill in your details to complete the order</p>
+    <div class="test-info">
+      <h5>⚡ Test Mode — Use these credentials</h5>
+      <p>Card: <span>4111 1111 1111 1111</span></p>
+      <p>Expiry: <span>Any future date</span> &nbsp; CVV: <span>Any 3 digits</span></p>
+      <p>UPI ID: <span>success@razorpay</span></p>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>First Name</label><input type="text" class="form-input" id="fname" placeholder="Ravi"/></div>
+      <div class="form-group"><label>Last Name</label><input type="text" class="form-input" id="lname" placeholder="Kumar"/></div>
+    </div>
+    <div class="form-group"><label>Email</label><input type="email" class="form-input" id="femail" placeholder="ravi@gmail.com"/></div>
+    <div class="form-group"><label>Phone (10 digits)</label><input type="tel" class="form-input" id="fphone" placeholder="9876543210" maxlength="10"/></div>
+    <div class="form-group"><label>Delivery Address</label><input type="text" class="form-input" id="faddress" placeholder="House No, Street, City, State, PIN"/></div>
+    <div class="rzp-note">
+      <span class="rzp-badge">RAZORPAY</span>
+      <span>Replace <code style="color:var(--yellow)">rzp_test_YourKeyHere</code> in the code with your actual Key ID from razorpay.com dashboard.</span>
+    </div>
+    <button class="btn-primary" style="width:100%;text-align:center;border:none;" onclick="initiateRazorpay()">
+      PROCEED TO PAY <span id="modalPayAmount"></span>
+    </button>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="successModal">
+  <div class="success-modal">
+    <div class="success-icon">✅</div>
+    <h3>ORDER PLACED!</h3>
+    <p>Thank you for shopping with MerchBabu.</p>
+    <p>Your order has been received and will be dispatched soon.</p>
+    <div class="order-id" id="orderId">ORDER ID: —</div>
+    <button class="btn-primary" onclick="closeSuccess()">CONTINUE SHOPPING</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════ PRODUCT CATALOG ══════
+const CATALOG = {
+  bestsellers:[
+    {id:1,name:"ALLU ARJUN (ACID WASH)",price:750,badge:"Bestseller",img:"https://merchbabu1.myshopify.com/cdn/shop/files/Back_2_c_2_fa68accc-b9eb-4bda-9e72-125a2e2622a7.jpg?v=1770659150&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/Front_1_c_2_f6de0b5a-1fd8-4145-9693-7d03894de2ae.jpg?v=1770659161&width=600",sizes:["S","M","L","XL","XXL"]},
+    {id:2,name:"ANIRUDH TEE (LIMITED EDITION)",price:650,badge:"Limited",img:"https://merchbabu1.myshopify.com/cdn/shop/files/ANI_POST_2.png?v=1771957402&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/ANI_POST_1.png?v=1771957402&width=600",sizes:["S","M","L","XL","XXL"]},
+    {id:3,name:"BABU LAKE BABU ACID WASH OVERSIZED",price:750,badge:null,img:"https://merchbabu1.myshopify.com/cdn/shop/files/Front_1_c_2_367c2fd0-3004-4555-8693-fdb790394cd0.jpg?v=1769242666&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/Back_2_c_2_875e9d56-371b-4832-90ba-b40d1938930f.jpg?v=1769242671&width=600",sizes:["S","M","L","XL","XXL"]},
+    {id:4,name:"BABU LAKE BABU CASUAL FIT",price:499,badge:null,img:"https://merchbabu1.myshopify.com/cdn/shop/files/Front_1_c_2_f6688d27-c927-40d8-bb45-4126144b4a3b.jpg?v=1769241679&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/Back_2_c_2_88399039-fc08-4ec0-a862-3ff94ded95c4.jpg?v=1769241684&width=600",sizes:["S","M","L","XL","XXL"]},
+    {id:5,name:"BABU LAKE BABU HOODIE",price:1200,badge:"Hot",img:"https://merchbabu1.myshopify.com/cdn/shop/files/Back_2_c_2_978fffc5-c028-4bd5-ab7d-7522d0876cdc.jpg?v=1771137699&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/Back_2_c_1_ea478d25-b205-4f68-8082-9916ad3f5268.jpg?v=1771137699&width=600",sizes:["S","M","L","XL","XXL"]},
+    {id:6,name:"BABU LAKE BABU OVERSIZED TEE",price:599,badge:null,img:"https://merchbabu1.myshopify.com/cdn/shop/files/Front_1_c_2.jpg?v=1769241669&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/Back_2_c_2.jpg?v=1769241674&width=600",sizes:["S","M","L","XL","XXL"]},
+    {id:7,name:"BABU STICKERS",price:180,badge:"New",img:"https://merchbabu1.myshopify.com/cdn/shop/files/InDown.ai_575182725_17881391490409335_4662323457910090907_n_1.jpg?v=1771047517&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/InDown.ai_575182725_17881391490409335_4662323457910090907_n_1.jpg?v=1771047517&width=600",sizes:["One Size"]},
+    {id:8,name:"BIGGEST COMEDIAN BRAHMI (OVERSIZED)",price:599,badge:null,img:"https://merchbabu1.myshopify.com/cdn/shop/files/Front_1_c_2_85b9d77b-7667-4369-bcec-36a72f102b99.jpg?v=1770352209&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/Back_2_c_2_dd71383f-d418-455f-befa-981b8bad9326.jpg?v=1770352091&width=600",sizes:["S","M","L","XL","XXL"]},
+  ],
+  ustaad:[
+    {id:9,name:"USTAAD TEE (OVERSIZED)",price:599,badge:"New",img:"https://merchbabu1.myshopify.com/cdn/shop/files/USTAAD_POSSTT_1.png?v=1771739695&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/Front_1_c_1_7e7f49cb-124b-4da8-a8de-d283608de778.jpg?v=1771739695&width=600",sizes:["S","M","L","XL","XXL"]},
+    {id:10,name:"USTAAD HOODIE",price:1200,badge:"New",img:"https://merchbabu1.myshopify.com/cdn/shop/files/USTAAD_POST_2.png?v=1771739580&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/Front_1_c_2_0dcec788-de7c-4c82-96cb-a403b87b2b7a.jpg?v=1771739580&width=600",sizes:["S","M","L","XL","XXL"]},
+  ],
+  mahesh:[
+    {id:11,name:"BABU LAKE BABU ACID WASH OVERSIZED",price:750,badge:null,img:"https://merchbabu1.myshopify.com/cdn/shop/files/Front_1_c_2_367c2fd0-3004-4555-8693-fdb790394cd0.jpg?v=1769242666&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/Back_2_c_2_875e9d56-371b-4832-90ba-b40d1938930f.jpg?v=1769242671&width=600",sizes:["S","M","L","XL","XXL"]},
+    {id:12,name:"MAHESH BABU TWO SIDE PRINT (OVERSIZED)",price:650,badge:null,img:"https://merchbabu1.myshopify.com/cdn/shop/files/Front_1_c_2_78e654c0-df06-4f82-9934-f66d633bbb75.jpg?v=1769574421&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/Back_2_c_2_4459aa5a-47ce-4564-a43d-ee82835a55ec.jpg?v=1769574421&width=600",sizes:["S","M","L","XL","XXL"]},
+    {id:13,name:"MAHESH BABU MIXED (ACID WASH)",price:750,badge:null,img:"https://merchbabu1.myshopify.com/cdn/shop/files/Front_1_c_2_3c7587fd-aa9c-42ae-9f53-0cd633595c27.jpg?v=1769530804&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/Back_2_c_2_c467d78f-911d-47c2-a019-249788740b23.jpg?v=1769530809&width=600",sizes:["S","M","L","XL","XXL"]},
+    {id:14,name:"MAHESH BABU MIXED (OVERSIZED)",price:599,badge:null,img:"https://merchbabu1.myshopify.com/cdn/shop/files/Front_1_c_2_c7bbbadb-af48-43d9-b3a2-962338c15f7d.jpg?v=1770361470&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/Back_2_c_2_4a2f4268-a5d2-462a-b1ef-cf342b150243.jpg?v=1770361474&width=600",sizes:["S","M","L","XL","XXL"]},
+    {id:15,name:"MAHESHBABU TRIPLE THREAT (ACID WASH)",price:750,badge:null,img:"https://merchbabu1.myshopify.com/cdn/shop/files/Front_1_c_2_c34b86c0-5cd8-4bc2-a12b-60b9d11d3dee.jpg?v=1770352071&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/Back_2_c_2_8243668c-5ea9-4fbe-8a82-cfd61e1055bc.jpg?v=1770352075&width=600",sizes:["S","M","L","XL","XXL"]},
+    {id:16,name:"VARANASI BOB (OVERSIZED)",price:599,badge:null,img:"https://merchbabu1.myshopify.com/cdn/shop/files/Front_1_c_2_843e64ab-f10d-4e5b-b377-6efc62162d93.jpg?v=1770224195&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/Front_1_c_1_09b1e5fa-4f2f-46d8-be66-4f90dda54b81.jpg?v=1770224195&width=600",sizes:["S","M","L","XL","XXL"]},
+  ],
+  comic:[
+    {id:17,name:"CUTOUT TEE (OVERSIZED)",price:599,badge:null,img:"https://merchbabu1.myshopify.com/cdn/shop/files/Front_1_c_2_1269362a-0bed-478c-81da-36863d8332df.jpg?v=1769594995&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/Front_1_c_1_9372e927-d2ee-43ee-99ac-4f167a62d943.jpg?v=1769594995&width=600",sizes:["S","M","L","XL","XXL"]},
+    {id:18,name:"NAKU OO GUN ISTHARA (OVERSIZED)",price:599,badge:null,img:"https://merchbabu1.myshopify.com/cdn/shop/files/gun_isthara_post.png?v=1771137475&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/gun_isthara_post.png?v=1771137475&width=600",sizes:["S","M","L","XL","XXL"]},
+    {id:19,name:"BIGGEST COMEDIAN BRAHMI (OVERSIZED)",price:599,badge:null,img:"https://merchbabu1.myshopify.com/cdn/shop/files/Front_1_c_2_85b9d77b-7667-4369-bcec-36a72f102b99.jpg?v=1770352209&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/Back_2_c_2_dd71383f-d418-455f-befa-981b8bad9326.jpg?v=1770352091&width=600",sizes:["S","M","L","XL","XXL"]},
+  ],
+  cricket:[
+    {id:20,name:"VIRAT KOHLI TEE",price:650,badge:null,img:"https://merchbabu1.myshopify.com/cdn/shop/files/Back_2_c_2_139b994b-43a5-4f51-a8b1-0a56ab9d7553.jpg?v=1769535275&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/Back_2_c_1_219f9e66-7cd1-4c41-9ea3-3b4286c3d88b.jpg?v=1770351732&width=600",sizes:["S","M","L","XL","XXL"]},
+  ],
+  stickers:[
+    {id:21,name:"BABU STICKERS",price:180,badge:"New",img:"https://merchbabu1.myshopify.com/cdn/shop/files/InDown.ai_575182725_17881391490409335_4662323457910090907_n_1.jpg?v=1771047517&width=600",img2:"https://merchbabu1.myshopify.com/cdn/shop/files/InDown.ai_575182725_17881391490409335_4662323457910090907_n_1.jpg?v=1771047517&width=600",sizes:["One Size"]},
+  ]
+};
+const ALL = Object.values(CATALOG).flat();
+
+// ══════ DISCOUNT CODES ══════
+const CODES = {
+  "BABU10":  {type:"percent",value:10,  label:"10% off"},
+  "SAVE100": {type:"flat",   value:100, label:"₹100 off", minOrder:1500},
+  "GANG20":  {type:"percent",value:20,  label:"20% off",  minItems:3},
+  "TELUGU15":{type:"percent",value:15,  label:"15% off"},
+};
+
+// ══════ STATE ══════
+let cart=[], appliedCode=null;
+
+// ══════ RENDER PRODUCTS ══════
+function mkCard(p){
+  const sizes=p.sizes.map(s=>`<button class="card-size" onclick="event.stopPropagation();pickSize(this,'${s}',${p.id})">${s}</button>`).join('');
+  return `<div class="product-card"><div class="product-img-wrap"><img src="${p.img}" alt="${p.name}" loading="lazy"/><img src="${p.img2}" alt="${p.name}" class="img-alt" loading="lazy"/>${p.badge?`<span class="product-badge">${p.badge}</span>`:''}</div><div class="product-info"><p class="product-name">${p.name}</p><p class="product-price">₹${p.price.toLocaleString('en-IN')}</p><div class="card-sizes" id="sz-${p.id}">${sizes}</div><button class="card-add" id="add-${p.id}" disabled onclick="doAdd(${p.id})">SELECT SIZE</button></div></div>`;
+}
+for(const [k,items] of Object.entries(CATALOG)){
+  const el=document.getElementById(`grid-${k}`);
+  if(el) el.innerHTML=items.map(mkCard).join('');
+}
+
+function pickSize(btn,size,pid){
+  document.getElementById(`sz-${pid}`).querySelectorAll('.card-size').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  const ab=document.getElementById(`add-${pid}`);
+  ab.disabled=false; ab.textContent='ADD TO CART'; ab.dataset.size=size;
+}
+
+let featSzVal='M';
+function featSz(btn){
+  document.querySelectorAll('#featuredSizes .sz-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); featSzVal=btn.textContent;
+}
+function addFeaturedToCart(){push(2,featSzVal);}
+function doAdd(pid){
+  const btn=document.getElementById(`add-${pid}`);
+  if(btn.dataset.size) push(pid,btn.dataset.size);
+}
+
+// ══════ CART LOGIC ══════
+function push(pid,size){
+  const p=ALL.find(x=>x.id===pid); if(!p) return;
+  const key=`${pid}_${size}`;
+  const ex=cart.find(x=>x.key===key);
+  if(ex) ex.qty++; else cart.push({...p,size,qty:1,key});
+  appliedCode=null;
+  document.getElementById('discountInput').value='';
+  document.getElementById('discountMsg').textContent='';
+  render(); openCart();
+  showToast(`✓ ${p.name} (${size}) added to cart!`);
+}
+
+function chQty(key,d){
+  const i=cart.find(x=>x.key===key); if(!i) return;
+  i.qty+=d; if(i.qty<=0) cart=cart.filter(x=>x.key!==key);
+  appliedCode=null;
+  render();
+}
+
+function rmItem(key){
+  cart=cart.filter(x=>x.key!==key); appliedCode=null; render();
+}
+
+function getSubtotal(){return cart.reduce((a,b)=>a+b.price*b.qty,0);}
+function getTotalItems(){return cart.reduce((a,b)=>a+b.qty,0);}
+function getDiscount(sub){
+  if(!appliedCode) return 0;
+  const d=CODES[appliedCode];
+  if(d.type==='percent') return Math.round(sub*d.value/100);
+  if(d.type==='flat') return d.value;
+  return 0;
+}
+function getFinalTotal(){
+  const sub=getSubtotal(), disc=getDiscount(sub);
+  const ship=sub-disc>=999?0:79;
+  return sub-disc+ship;
+}
+
+function render(){
+  const count=getTotalItems();
+  document.getElementById('cartCount').textContent=count;
+  document.getElementById('cartItemCount').textContent=count;
+  const body=document.getElementById('cartBody');
+  const footer=document.getElementById('cartFooter');
+  if(cart.length===0){
+    body.innerHTML=`<div class="cart-empty-msg"><p>Your cart is empty 🛒</p><a href="#catalog" class="btn-primary" onclick="closeCart()">Start Shopping</a></div>`;
+    footer.style.display='none'; return;
+  }
+  body.innerHTML=cart.map(i=>`<div class="cart-item"><img src="${i.img}" alt="${i.name}"/><div class="cart-item-info"><p class="cart-item-name">${i.name}</p><p class="cart-item-size">Size: ${i.size}</p><p class="cart-item-price">₹${i.price.toLocaleString('en-IN')}</p><div class="cart-item-row"><div class="qty-wrap"><button class="qty-btn" onclick="chQty('${i.key}',-1)">−</button><span class="qty-num">${i.qty}</span><button class="qty-btn" onclick="chQty('${i.key}',1)">+</button></div><button class="remove-btn" onclick="rmItem('${i.key}')">Remove</button></div></div></div>`).join('');
+  footer.style.display='block';
+  updateSummary();
+}
+
+function updateSummary(){
+  const sub=getSubtotal(), disc=getDiscount(sub), ship=sub-disc>=999?0:79, total=sub-disc+ship;
+  document.getElementById('subtotalDisplay').textContent=`₹${sub.toLocaleString('en-IN')}`;
+  document.getElementById('shippingDisplay').textContent=ship===0?'FREE 🎉':`₹${ship}`;
+  document.getElementById('totalDisplay').textContent=`₹${total.toLocaleString('en-IN')}`;
+  const dr=document.getElementById('discountRow');
+  if(disc>0){
+    dr.style.display='flex';
+    document.getElementById('discountLabel').textContent=`Discount (${appliedCode})`;
+    document.getElementById('discountAmount').textContent=`-₹${disc.toLocaleString('en-IN')}`;
+  } else dr.style.display='none';
+}
+
+// ══════ DISCOUNT ══════
+function applyDiscount(){
+  const code=document.getElementById('discountInput').value.trim().toUpperCase();
+  const msg=document.getElementById('discountMsg');
+  const d=CODES[code];
+  if(!d){msg.className='discount-msg err';msg.textContent='✗ Invalid code. Try: BABU10, SAVE100, GANG20, TELUGU15';appliedCode=null;updateSummary();return;}
+  const sub=getSubtotal(), items=getTotalItems();
+  if(d.minOrder&&sub<d.minOrder){msg.className='discount-msg err';msg.textContent=`✗ Min order ₹${d.minOrder} required`;appliedCode=null;updateSummary();return;}
+  if(d.minItems&&items<d.minItems){msg.className='discount-msg err';msg.textContent=`✗ Add at least ${d.minItems} items to use this code`;appliedCode=null;updateSummary();return;}
+  appliedCode=code;
+  msg.className='discount-msg ok';msg.textContent=`✓ ${d.label} applied successfully!`;
+  updateSummary();
+}
+
+function copyCode(code){
+  navigator.clipboard.writeText(code).catch(()=>{});
+  showToast(`Copied code: ${code} — paste it in your cart!`);
+}
+
+// ══════ CART OPEN/CLOSE ══════
+function openCart(){document.getElementById('cartDrawer').classList.add('open');document.getElementById('cartOverlay').classList.add('open');}
+function closeCart(){document.getElementById('cartDrawer').classList.remove('open');document.getElementById('cartOverlay').classList.remove('open');}
+document.getElementById('cartBtn').addEventListener('click',openCart);
+
+// ══════ CHECKOUT ══════
+function openCheckout(){
+  if(cart.length===0) return;
+  document.getElementById('modalPayAmount').textContent=`— ₹${getFinalTotal().toLocaleString('en-IN')}`;
+  closeCart();
+  document.getElementById('checkoutModal').classList.add('open');
+}
+function closeCheckout(){document.getElementById('checkoutModal').classList.remove('open');}
+
+// ══════ RAZORPAY ══════
+function initiateRazorpay(){
+  const fname=document.getElementById('fname').value.trim();
+  const lname=document.getElementById('lname').value.trim();
+  const email=document.getElementById('femail').value.trim();
+  const phone=document.getElementById('fphone').value.trim();
+  const addr=document.getElementById('faddress').value.trim();
+  if(!fname||!email||!phone||!addr){showToast('⚠️ Please fill in all fields');return;}
+  if(!/^\d{10}$/.test(phone)){showToast('⚠️ Enter a valid 10-digit phone number');return;}
+  const amtPaise=getFinalTotal()*100;
+  const opts={
+    // ⚠️ REPLACE THIS WITH YOUR RAZORPAY KEY ID from razorpay.com → Settings → API Keys
+    key:"rzp_test_YourKeyHere",
+    amount:amtPaise,
+    currency:"INR",
+    name:"MerchBabu",
+    description:`${getTotalItems()} item(s) — MerchBabu Order`,
+    image:"https://merchbabu1.myshopify.com/cdn/shop/files/website_pfp.png?v=1769443729",
+    prefill:{name:`${fname} ${lname}`,email,contact:phone},
+    notes:{address:addr,discount_code:appliedCode||"None"},
+    theme:{color:"#e8320a"},
+    handler:function(res){closeCheckout();onSuccess(res);},
+    modal:{ondismiss:function(){showToast('Payment cancelled. Your cart is saved ✓');}}
+  };
+  try{
+    const rzp=new Razorpay(opts);
+    rzp.on('payment.failed',function(r){showToast('⚠️ Payment failed: '+r.error.description);});
+    rzp.open();
+  } catch(e){
+    // Demo fallback when key is placeholder
+    demoPayment();
+  }
+}
+
+function demoPayment(){
+  closeCheckout();
+  onSuccess({razorpay_payment_id:'DEMO_'+Math.random().toString(36).slice(2,10).toUpperCase()});
+}
+
+function onSuccess(res){
+  const id=res.razorpay_payment_id||'UNKNOWN';
+  document.getElementById('orderId').textContent=`ORDER ID: ${id}`;
+  document.getElementById('successModal').classList.add('open');
+  cart=[]; appliedCode=null; render();
+  ['fname','lname','femail','fphone','faddress'].forEach(x=>document.getElementById(x).value='');
+  document.getElementById('discountInput').value='';
+  document.getElementById('discountMsg').textContent='';
+}
+
+function closeSuccess(){document.getElementById('successModal').classList.remove('open');}
+
+// ══════ TOAST ══════
+let toastT;
+function showToast(m){
+  const t=document.getElementById('toast');
+  t.textContent=m; t.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ══════ SCROLL ANIM ══════
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:.08});
+document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+
+render();
+</script>
+</body>
+</html>
