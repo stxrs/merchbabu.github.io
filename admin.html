@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MerchBabu — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    :root{--black:#0a0a0a;--white:#f5f0e8;--accent:#e8320a;--gold:#d4a017;--dark:#111;--card:#1a1a1a;--border:#2a2a2a;--muted:#888;--green:#22c55e;--yellow:#facc15;--blue:#3b82f6;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--black);color:var(--white);font-family:'Rajdhani',sans-serif;min-height:100vh;}
+
+    .login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:radial-gradient(ellipse at 60% 40%,rgba(232,50,10,.08) 0%,transparent 70%);}
+    .login-box{background:var(--dark);border:1px solid var(--border);padding:48px;width:400px;text-align:center;}
+    .login-logo{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:5px;color:var(--accent);margin-bottom:4px;}
+    .login-sub{font-size:11px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:32px;}
+    .login-input{width:100%;background:var(--black);border:1px solid var(--border);color:var(--white);padding:13px 16px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;outline:none;margin-bottom:12px;transition:border-color .2s;}
+    .login-input:focus{border-color:var(--accent);}
+    .login-btn{width:100%;background:var(--accent);color:#fff;border:none;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;cursor:pointer;transition:background .2s;}
+    .login-btn:hover{background:#c02a08;}
+    .login-err{color:var(--accent);font-size:13px;margin-top:10px;min-height:18px;}
+    .login-hint{font-size:11px;color:var(--muted);margin-top:20px;line-height:1.7;}
+
+    .admin-layout{display:none;min-height:100vh;}
+    .admin-layout.visible{display:flex;}
+    .sidebar{width:230px;background:var(--dark);border-right:1px solid var(--border);flex-shrink:0;display:flex;flex-direction:column;}
+    .sidebar-logo{padding:24px 20px;border-bottom:1px solid var(--border);}
+    .sidebar-logo h2{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;}
+    .sidebar-logo p{font-size:11px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
+    .admin-email{font-size:11px;color:var(--accent);margin-top:6px;word-break:break-all;}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:14px 20px;cursor:pointer;transition:all .2s;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border:none;border-left:3px solid transparent;background:none;color:var(--white);width:100%;text-align:left;}
+    .nav-item:hover{background:var(--card);}
+    .nav-item.active{background:rgba(232,50,10,.12);color:var(--accent);border-left-color:var(--accent);}
+    .sidebar-footer{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border);}
+    .logout-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:9px 16px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:1px;width:100%;}
+    .logout-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+    .main-content{flex:1;overflow-y:auto;}
+    .page-header{padding:26px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+    .page-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:4px;}
+    .page-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+    .header-actions{display:flex;gap:10px;flex-wrap:wrap;}
+    .action-btn{background:transparent;border:1px solid var(--border);color:var(--white);padding:8px 18px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all .2s;white-space:nowrap;}
+    .action-btn:hover{border-color:var(--accent);color:var(--accent);}
+    .action-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+    .action-btn.primary:hover{background:#c02a08;}
+    .action-btn.green-btn{background:rgba(34,197,94,.1);border-color:var(--green);color:var(--green);}
+    .action-btn.green-btn:hover{background:var(--green);color:#000;}
+
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);}
+    .stat-card{background:var(--dark);padding:24px 28px;}
+    .stat-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+    .stat-value{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:2px;}
+    .stat-value.green{color:var(--green);}
+    .stat-value.gold{color:var(--gold);}
+    .stat-value.accent{color:var(--accent);}
+    .stat-value.blue{color:var(--blue);}
+    .stat-change{font-size:12px;margin-top:4px;color:var(--muted);}
+
+    .charts-row{display:grid;grid-template-columns:2fr 1fr;gap:1px;background:var(--border);margin-top:1px;}
+    .chart-card{background:var(--dark);padding:24px 28px;}
+    .chart-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;margin-bottom:16px;}
+    .chart-wrap{position:relative;height:220px;}
+
+    .table-wrap{padding:24px 32px;}
+    .table-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+    .table-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;}
+    .filter-row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+    .filter-select{background:var(--dark);border:1px solid var(--border);color:var(--white);padding:9px 14px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;outline:none;cursor:pointer;}
+    .filter-input{background:var(--dark);border:1px solid var(--border);color:var(--white);padding:9px 14px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;outline:none;flex:1;min-width:200px;}
+    .filter-input::placeholder{color:var(--muted);}
+    table{width:100%;border-collapse:collapse;font-size:13px;}
+    th{text-align:left;padding:11px 14px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);background:var(--card);border-bottom:1px solid var(--border);}
+    td{padding:13px 14px;border-bottom:1px solid var(--border);vertical-align:top;}
+    tr:hover td{background:rgba(255,255,255,.02);}
+    .badge{display:inline-block;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+    .badge.paid{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.3);}
+    .badge.pending{background:rgba(250,204,21,.12);color:var(--yellow);border:1px solid rgba(250,204,21,.3);}
+    .badge.failed{background:rgba(232,50,10,.12);color:var(--accent);border:1px solid rgba(232,50,10,.3);}
+    .order-items span{display:block;font-size:12px;color:var(--muted);}
+
+    .inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:var(--border);}
+    .inv-card{background:var(--dark);padding:20px;}
+    .inv-name{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
+    .inv-sizes{display:flex;flex-wrap:wrap;gap:6px;}
+    .inv-size{display:flex;flex-direction:column;align-items:center;width:52px;padding:8px 4px;background:var(--black);border:1px solid var(--border);}
+    .inv-size .sz{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--muted);}
+    .inv-size .qty{font-family:'Bebas Neue',sans-serif;font-size:22px;margin:2px 0;}
+    .inv-size .qty.low{color:var(--accent);}
+    .inv-size .qty.ok{color:var(--green);}
+    .inv-size input{width:44px;background:transparent;border:1px solid var(--border);color:var(--white);text-align:center;padding:4px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;outline:none;display:none;}
+    .inv-save{margin-top:10px;width:100%;background:var(--accent);color:#fff;border:none;padding:8px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:background .2s;}
+    .inv-save:hover{background:#c02a08;}
+
+    .add-code-form{background:var(--dark);border:1px solid var(--border);padding:24px;margin-bottom:24px;}
+    .add-code-form h4{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;margin-bottom:16px;}
+    .form-row-inline{display:flex;gap:10px;flex-wrap:wrap;}
+    .form-field{display:flex;flex-direction:column;gap:5px;flex:1;min-width:110px;}
+    .form-field label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+    .form-field input,.form-field select{background:var(--black);border:1px solid var(--border);color:var(--white);padding:9px 12px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;outline:none;}
+    .form-field input:focus,.form-field select:focus{border-color:var(--accent);}
+
+    .loading{text-align:center;padding:60px;color:var(--muted);font-size:14px;}
+    .spinner{display:inline-block;width:22px;height:22px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-right:8px;vertical-align:middle;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .section{display:none;}
+    .section.active{display:block;}
+    .toast{position:fixed;bottom:24px;right:24px;background:var(--dark);border:1px solid var(--accent);color:var(--white);padding:12px 22px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;max-width:320px;}
+    .toast.show{opacity:1;}
+    @media(max-width:768px){.stats-grid{grid-template-columns:repeat(2,1fr);}.charts-row{grid-template-columns:1fr;}.sidebar{width:60px;}.sidebar-logo h2,.sidebar-logo p,.admin-email,.nav-item span,.sidebar-footer{display:none;}.nav-item{padding:14px;justify-content:center;}.table-wrap{padding:16px;}}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">MERCHBABU</div>
+    <div class="login-sub">Admin Dashboard</div>
+    <input type="email" class="login-input" id="adminEmail" placeholder="your@email.com" autocomplete="email"/>
+    <input type="password" class="login-input" id="adminPass" placeholder="Password" autocomplete="current-password"/>
+    <button class="login-btn" onclick="doLogin()">LOGIN →</button>
+    <p class="login-err" id="loginErr"></p>
+    <p class="login-hint">
+      Create your admin account in:<br/>
+      <strong style="color:var(--white);">Supabase → Authentication → Users → Add User</strong><br/>
+      Use that email &amp; password here.
+    </p>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="admin-layout" id="adminLayout">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <h2>MERCHBABU</h2>
+      <p>ADMIN PANEL</p>
+      <div class="admin-email" id="adminEmailDisplay"></div>
+    </div>
+    <button class="nav-item active" onclick="showSection('dashboard',this)">📊 &nbsp;Dashboard</button>
+    <button class="nav-item" onclick="showSection('orders',this)">📦 &nbsp;Orders</button>
+    <button class="nav-item" onclick="showSection('inventory',this)">🗃️ &nbsp;Inventory</button>
+    <button class="nav-item" onclick="showSection('discounts',this)">🏷️ &nbsp;Discounts</button>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="doLogout()">⏻ LOGOUT</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+
+    <!-- DASHBOARD -->
+    <div class="section active" id="sec-dashboard">
+      <div class="page-header">
+        <div><p class="page-title">DASHBOARD</p><p class="page-sub" id="dashDate"></p></div>
+        <div class="header-actions">
+          <button class="action-btn green-btn" onclick="exportAllOrders()">⬇ Export All to Excel</button>
+          <button class="action-btn" onclick="loadDashboard()">↻ Refresh</button>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Total Revenue</div><div class="stat-value gold" id="statRevenue">—</div><div class="stat-change" id="statRevChange"></div></div>
+        <div class="stat-card"><div class="stat-label">Orders Today</div><div class="stat-value accent" id="statToday">—</div><div class="stat-change" id="statTodayChange"></div></div>
+        <div class="stat-card"><div class="stat-label">Total Orders</div><div class="stat-value blue" id="statTotal">—</div><div class="stat-change"></div></div>
+        <div class="stat-card"><div class="stat-label">Paid Orders</div><div class="stat-value green" id="statPaid">—</div><div class="stat-change" id="statPaidPct"></div></div>
+      </div>
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-title">DAILY SALES — LAST 14 DAYS</div>
+          <div class="chart-wrap"><canvas id="salesChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">ORDERS BY STATUS</div>
+          <div class="chart-wrap"><canvas id="statusChart"></canvas></div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-top">
+          <div class="table-title">RECENT ORDERS</div>
+          <button class="action-btn green-btn" onclick="exportAllOrders()">⬇ Export to Excel</button>
+        </div>
+        <div id="recentOrders"><div class="loading"><span class="spinner"></span>Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="section" id="sec-orders">
+      <div class="page-header">
+        <div><p class="page-title">ALL ORDERS</p><p class="page-sub" id="ordersCount">Loading...</p></div>
+        <div class="header-actions">
+          <button class="action-btn green-btn" onclick="exportFilteredOrders()">⬇ Export to Excel</button>
+          <button class="action-btn" onclick="loadOrders()">↻ Refresh</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <div class="filter-row">
+          <select class="filter-select" id="statusFilter" onchange="loadOrders()">
+            <option value="">All Status</option>
+            <option value="paid">✅ Paid</option>
+            <option value="pending">⏳ Pending</option>
+            <option value="failed">❌ Failed</option>
+          </select>
+          <select class="filter-select" id="dateFilter" onchange="loadOrders()">
+            <option value="">All Time</option>
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+          </select>
+          <input type="text" class="filter-input" id="searchFilter" placeholder="Search name, email, order ID..." oninput="loadOrders()"/>
+        </div>
+        <div id="ordersTable"><div class="loading"><span class="spinner"></span>Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- INVENTORY -->
+    <div class="section" id="sec-inventory">
+      <div class="page-header">
+        <div><p class="page-title">INVENTORY</p><p class="page-sub">Edit stock per product per size</p></div>
+        <button class="action-btn" onclick="loadInventory()">↻ Refresh</button>
+      </div>
+      <div class="table-wrap">
+        <div id="inventoryGrid"><div class="loading"><span class="spinner"></span>Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- DISCOUNTS -->
+    <div class="section" id="sec-discounts">
+      <div class="page-header">
+        <div><p class="page-title">DISCOUNT CODES</p><p class="page-sub">Create and manage promo codes</p></div>
+      </div>
+      <div class="table-wrap">
+        <div class="add-code-form">
+          <h4>➕ CREATE NEW CODE</h4>
+          <div class="form-row-inline">
+            <div class="form-field"><label>Code</label><input type="text" id="newCode" placeholder="HOLI25" style="text-transform:uppercase;"/></div>
+            <div class="form-field"><label>Type</label><select id="newType"><option value="percent">Percent (%)</option><option value="flat">Flat (₹)</option></select></div>
+            <div class="form-field"><label>Value</label><input type="number" id="newValue" placeholder="15" min="1"/></div>
+            <div class="form-field"><label>Min Order ₹</label><input type="number" id="newMinOrder" placeholder="0" min="0" value="0"/></div>
+            <div class="form-field"><label>Min Items</label><input type="number" id="newMinItems" placeholder="0" min="0" value="0"/></div>
+            <div class="form-field"><label>Max Uses</label><input type="number" id="newMaxUses" placeholder="9999" min="1" value="9999"/></div>
+          </div>
+          <button class="action-btn primary" style="margin-top:14px;" onclick="createCode()">CREATE CODE</button>
+        </div>
+        <div id="discountsTable"><div class="loading"><span class="spinner"></span>Loading...</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── REPLACE THESE WITH YOUR SUPABASE DETAILS ──
+  const SUPABASE_URL  = "https://rukpsjwywztflngflunn.supabase.co";
+  const SUPABASE_ANON = "sb_publishable_2gYxX02EAvUjZonV92uRFQ_MCW-9SXd";
+  // ──────────────────────────────────────────────
+
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_URL, SUPABASE_ANON);
+  let salesChartInst = null, statusChartInst = null, allOrdersCache = [];
+
+  // ══ AUTH ══
+  async function doLogin() {
+    const email = document.getElementById('adminEmail').value.trim();
+    const pass  = document.getElementById('adminPass').value;
+    const errEl = document.getElementById('loginErr');
+    errEl.textContent = '';
+    const btn = document.querySelector('.login-btn');
+    btn.textContent = 'LOGGING IN...'; btn.disabled = true;
+    const { data, error } = await db.auth.signInWithPassword({ email, password: pass });
+    btn.textContent = 'LOGIN →'; btn.disabled = false;
+    if (error) { errEl.textContent = '✗ ' + error.message; return; }
+    document.getElementById('adminEmailDisplay').textContent = data.user.email;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminLayout').classList.add('visible');
+    document.getElementById('dashDate').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    loadDashboard();
+  }
+  async function doLogout(){ await db.auth.signOut(); location.reload(); }
+  document.addEventListener('keydown', e => { if(e.key==='Enter' && document.getElementById('loginScreen').style.display!=='none') doLogin(); });
+
+  // ══ NAV ══
+  function showSection(name, btn) {
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+    document.getElementById(`sec-${name}`).classList.add('active');
+    btn.classList.add('active');
+    ({dashboard:loadDashboard, orders:loadOrders, inventory:loadInventory, discounts:loadDiscounts}[name])();
+  }
+
+  // ══ DASHBOARD ══
+  async function loadDashboard() {
+    const { data: orders } = await db.from('orders').select('*').order('created_at',{ascending:false});
+    if (!orders) return;
+    allOrdersCache = orders;
+    const paid=orders.filter(o=>o.payment_status==='paid');
+    const pending=orders.filter(o=>o.payment_status==='pending');
+    const failed=orders.filter(o=>o.payment_status==='failed');
+    const revenue=paid.reduce((a,b)=>a+b.total,0);
+    const todayStr=new Date().toDateString();
+    const todayOrders=orders.filter(o=>new Date(o.created_at).toDateString()===todayStr);
+    const todayRev=todayOrders.filter(o=>o.payment_status==='paid').reduce((a,b)=>a+b.total,0);
+    document.getElementById('statRevenue').textContent='₹'+revenue.toLocaleString('en-IN');
+    document.getElementById('statRevChange').textContent='Today: ₹'+todayRev.toLocaleString('en-IN');
+    document.getElementById('statToday').textContent=todayOrders.length;
+    document.getElementById('statTodayChange').textContent=todayOrders.filter(o=>o.payment_status==='paid').length+' paid today';
+    document.getElementById('statTotal').textContent=orders.length;
+    document.getElementById('statPaid').textContent=paid.length;
+    document.getElementById('statPaidPct').textContent=orders.length?Math.round(paid.length/orders.length*100)+'% success rate':'';
+    document.getElementById('recentOrders').innerHTML=renderOrdersTable(orders.slice(0,10));
+
+    // Daily sales chart
+    const labels=[],revenues=[],counts=[];
+    for(let i=13;i>=0;i--){
+      const d=new Date(); d.setDate(d.getDate()-i);
+      const ds=d.toDateString();
+      const dayPaid=paid.filter(o=>new Date(o.created_at).toDateString()===ds);
+      labels.push(d.toLocaleDateString('en-IN',{day:'numeric',month:'short'}));
+      revenues.push(dayPaid.reduce((a,b)=>a+b.total,0));
+      counts.push(dayPaid.length);
+    }
+    if(salesChartInst) salesChartInst.destroy();
+    salesChartInst=new Chart(document.getElementById('salesChart').getContext('2d'),{
+      type:'bar',
+      data:{labels,datasets:[
+        {label:'Revenue (₹)',data:revenues,backgroundColor:'rgba(232,50,10,0.7)',borderColor:'#e8320a',borderWidth:1,yAxisID:'y'},
+        {label:'Orders',data:counts,type:'line',borderColor:'#d4a017',backgroundColor:'rgba(212,160,23,0.1)',borderWidth:2,pointBackgroundColor:'#d4a017',pointRadius:4,tension:0.4,yAxisID:'y1'}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:'#888',font:{family:'Rajdhani',size:12}}}},
+        scales:{
+          x:{ticks:{color:'#666',font:{family:'Rajdhani'}},grid:{color:'#1a1a1a'}},
+          y:{ticks:{color:'#d4a017',callback:v=>'₹'+v.toLocaleString('en-IN'),font:{family:'Rajdhani'}},grid:{color:'#1a1a1a'},position:'left'},
+          y1:{ticks:{color:'#888',font:{family:'Rajdhani'}},grid:{display:false},position:'right'}
+        }}
+    });
+
+    // Status donut
+    if(statusChartInst) statusChartInst.destroy();
+    statusChartInst=new Chart(document.getElementById('statusChart').getContext('2d'),{
+      type:'doughnut',
+      data:{labels:['Paid','Pending','Failed'],datasets:[{
+        data:[paid.length,pending.length,failed.length],
+        backgroundColor:['rgba(34,197,94,0.8)','rgba(250,204,21,0.8)','rgba(232,50,10,0.8)'],
+        borderColor:['#22c55e','#facc15','#e8320a'],borderWidth:1
+      }]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+        plugins:{legend:{position:'bottom',labels:{color:'#888',font:{family:'Rajdhani',size:12},padding:14}}}}
+    });
+  }
+
+  // ══ ORDERS ══
+  async function loadOrders() {
+    const status=document.getElementById('statusFilter').value;
+    const dateF=document.getElementById('dateFilter').value;
+    const search=document.getElementById('searchFilter').value.toLowerCase().trim();
+    let query=db.from('orders').select('*').order('created_at',{ascending:false});
+    if(status) query=query.eq('payment_status',status);
+    const {data:orders}=await query;
+    if(!orders) return;
+    let filtered=orders;
+    if(dateF==='today'){const t=new Date().toDateString();filtered=filtered.filter(o=>new Date(o.created_at).toDateString()===t);}
+    else if(dateF==='week'){const w=new Date();w.setDate(w.getDate()-7);filtered=filtered.filter(o=>new Date(o.created_at)>=w);}
+    else if(dateF==='month'){const m=new Date();m.setDate(m.getDate()-30);filtered=filtered.filter(o=>new Date(o.created_at)>=m);}
+    if(search) filtered=filtered.filter(o=>o.customer_name.toLowerCase().includes(search)||o.customer_email.toLowerCase().includes(search)||o.id.toLowerCase().includes(search)||(o.razorpay_payment_id||'').toLowerCase().includes(search));
+    allOrdersCache=filtered;
+    const paidTotal=filtered.filter(o=>o.payment_status==='paid').reduce((a,b)=>a+b.total,0);
+    document.getElementById('ordersCount').textContent=`${filtered.length} orders · ₹${paidTotal.toLocaleString('en-IN')} revenue`;
+    document.getElementById('ordersTable').innerHTML=renderOrdersTable(filtered);
+  }
+
+  function renderOrdersTable(orders) {
+    if(!orders.length) return '<p style="color:var(--muted);padding:20px 0;">No orders found.</p>';
+    return `<table><thead><tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody>
+      ${orders.map(o=>`<tr>
+        <td><span style="font-family:monospace;color:var(--gold);font-size:13px;">${o.id.slice(0,8).toUpperCase()}</span><br/><span style="font-size:11px;color:var(--muted);">${o.razorpay_payment_id||'—'}</span></td>
+        <td><strong>${o.customer_name}</strong><br/><span style="color:var(--muted);font-size:12px;">${o.customer_email}</span><br/><span style="color:var(--muted);font-size:12px;">📞 ${o.customer_phone}</span><br/><span style="color:var(--muted);font-size:11px;line-height:1.5;">${o.delivery_address}</span></td>
+        <td class="order-items">${o.items.map(i=>`<span>${i.name} <strong style="color:var(--white);">(${i.size})</strong> ×${i.qty}</span>`).join('')}${o.discount_code?`<span style="color:var(--green);">🏷️ ${o.discount_code} -₹${o.discount_amount}</span>`:''}</td>
+        <td><span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);">₹${o.total.toLocaleString('en-IN')}</span><br/><span style="font-size:11px;color:var(--muted);">Sub: ₹${o.subtotal.toLocaleString('en-IN')}</span></td>
+        <td><span class="badge ${o.payment_status}">${o.payment_status.toUpperCase()}</span></td>
+        <td style="color:var(--muted);font-size:12px;">${new Date(o.created_at).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'})}</td>
+      </tr>`).join('')}
+    </tbody></table>`;
+  }
+
+  // ══ EXPORT TO EXCEL ══
+  async function exportAllOrders() {
+    const {data:orders}=await db.from('orders').select('*').order('created_at',{ascending:false});
+    if(!orders?.length){showToast('No orders to export');return;}
+    doExport(orders,'MerchBabu_All_Orders');
+  }
+  function exportFilteredOrders(){
+    if(!allOrdersCache.length){showToast('No orders to export');return;}
+    doExport(allOrdersCache,'MerchBabu_Filtered_Orders');
+  }
+  function doExport(orders, filename) {
+    const rows=[];
+    for(const o of orders){
+      for(const item of o.items){
+        rows.push({
+          'Order ID':o.id.slice(0,8).toUpperCase(),
+          'Payment ID':o.razorpay_payment_id||'',
+          'Status':o.payment_status.toUpperCase(),
+          'Customer Name':o.customer_name,
+          'Email':o.customer_email,
+          'Phone':o.customer_phone,
+          'Address':o.delivery_address,
+          'Product':item.name,
+          'Size':item.size,
+          'Qty':item.qty,
+          'Item Price (₹)':item.price,
+          'Item Total (₹)':item.price*item.qty,
+          'Subtotal (₹)':o.subtotal,
+          'Discount Code':o.discount_code||'',
+          'Discount (₹)':o.discount_amount||0,
+          'Shipping (₹)':o.shipping,
+          'Order Total (₹)':o.total,
+          'Order Date':new Date(o.created_at).toLocaleString('en-IN'),
+        });
+      }
+    }
+    const ws=XLSX.utils.json_to_sheet(rows);
+    ws['!cols']=[{wch:12},{wch:18},{wch:10},{wch:20},{wch:28},{wch:14},{wch:40},{wch:36},{wch:8},{wch:5},{wch:14},{wch:14},{wch:14},{wch:14},{wch:12},{wch:12},{wch:14},{wch:22}];
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,'Orders');
+    const paid=orders.filter(o=>o.payment_status==='paid');
+    const summary=[
+      {'Metric':'Total Orders','Value':orders.length},
+      {'Metric':'Paid Orders','Value':paid.length},
+      {'Metric':'Total Revenue','Value':'₹'+paid.reduce((a,b)=>a+b.total,0).toLocaleString('en-IN')},
+      {'Metric':'Avg Order Value','Value':paid.length?'₹'+Math.round(paid.reduce((a,b)=>a+b.total,0)/paid.length).toLocaleString('en-IN'):'—'},
+      {'Metric':'Export Date','Value':new Date().toLocaleString('en-IN')},
+    ];
+    const ws2=XLSX.utils.json_to_sheet(summary);
+    ws2['!cols']=[{wch:20},{wch:20}];
+    XLSX.utils.book_append_sheet(wb,ws2,'Summary');
+    XLSX.writeFile(wb,`${filename}_${new Date().toISOString().slice(0,10)}.xlsx`);
+    showToast(`✓ Exported ${rows.length} rows to Excel!`);
+  }
+
+  // ══ INVENTORY ══
+  async function loadInventory() {
+    const {data:products}=await db.from('products').select('*').order('id');
+    const {data:inventory}=await db.from('inventory').select('*');
+    if(!products||!inventory) return;
+    const invMap={};
+    inventory.forEach(i=>{invMap[`${i.product_id}_${i.size}`]=i;});
+    document.getElementById('inventoryGrid').innerHTML=`<div class="inv-grid">${products.map(p=>{
+      const sizes=p.sizes||['S','M','L','XL','XXL'];
+      const total=sizes.reduce((a,s)=>a+(invMap[`${p.id}_${s}`]?.stock??0),0);
+      return `<div class="inv-card">
+        <div class="inv-name">${p.name} <span style="color:var(--muted);font-size:11px;font-weight:400;">(total: ${total})</span></div>
+        <div class="inv-sizes">${sizes.map(s=>{
+          const stock=invMap[`${p.id}_${s}`]?.stock??0;
+          return `<div class="inv-size"><span class="sz">${s}</span><span class="qty ${stock<=2?'low':'ok'}" id="qty-${p.id}-${s}">${stock}</span><input type="number" min="0" value="${stock}" id="inp-${p.id}-${s}"/></div>`;
+        }).join('')}</div>
+        <button class="inv-save" onclick="editInventory(${p.id},this)">EDIT STOCK</button>
+      </div>`;
+    }).join('')}</div>`;
+  }
+
+  async function editInventory(pid, btn) {
+    const isEdit=btn.textContent.trim()==='EDIT STOCK';
+    const card=btn.closest('.inv-card');
+    if(isEdit){
+      card.querySelectorAll('.inv-size').forEach(s=>{s.querySelector('input').style.display='block';s.querySelector('.qty').style.display='none';});
+      btn.textContent='SAVE STOCK'; return;
+    }
+    btn.textContent='SAVING...'; btn.disabled=true;
+    for(const s of card.querySelectorAll('.inv-size')){
+      const sz=s.querySelector('.sz').textContent;
+      const val=parseInt(s.querySelector('input').value)||0;
+      await db.from('inventory').upsert({product_id:pid,size:sz,stock:val},{onConflict:'product_id,size'});
+    }
+    showToast('✓ Stock updated!');
+    loadInventory();
+  }
+
+  // ══ DISCOUNTS ══
+  async function loadDiscounts() {
+    const {data:codes}=await db.from('discount_codes').select('*').order('created_at',{ascending:false});
+    if(!codes) return;
+    document.getElementById('discountsTable').innerHTML=`<table><thead><tr><th>Code</th><th>Type</th><th>Discount</th><th>Min Order</th><th>Min Items</th><th>Uses</th><th>Max Uses</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+      ${codes.map(c=>`<tr>
+        <td style="font-family:monospace;font-size:15px;color:var(--accent);font-weight:700;letter-spacing:1px;">${c.code}</td>
+        <td style="text-transform:uppercase;font-size:12px;color:var(--muted);">${c.type}</td>
+        <td style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);">${c.type==='percent'?c.value+'%':'₹'+c.value}</td>
+        <td style="color:var(--muted);">${c.min_order>0?'₹'+c.min_order:'—'}</td>
+        <td style="color:var(--muted);">${c.min_items>0?c.min_items+' items':'—'}</td>
+        <td style="font-weight:700;">${c.uses}</td>
+        <td style="color:var(--muted);">${c.max_uses}</td>
+        <td><span class="badge ${c.active?'paid':'failed'}">${c.active?'ACTIVE':'OFF'}</span></td>
+        <td style="display:flex;gap:6px;">
+          <button class="action-btn" onclick="toggleCode('${c.code}',${!c.active})">${c.active?'Disable':'Enable'}</button>
+          <button class="action-btn" style="color:var(--accent);border-color:var(--accent);" onclick="deleteCode('${c.code}')">Delete</button>
+        </td>
+      </tr>`).join('')}
+    </tbody></table>`;
+  }
+
+  async function createCode(){
+    const code=document.getElementById('newCode').value.trim().toUpperCase();
+    const type=document.getElementById('newType').value;
+    const value=parseInt(document.getElementById('newValue').value);
+    const minOrder=parseInt(document.getElementById('newMinOrder').value)||0;
+    const minItems=parseInt(document.getElementById('newMinItems').value)||0;
+    const maxUses=parseInt(document.getElementById('newMaxUses').value)||9999;
+    if(!code||!value){showToast('⚠️ Enter a code and value');return;}
+    const {error}=await db.from('discount_codes').insert({code,type,value,min_order:minOrder,min_items:minItems,max_uses:maxUses});
+    if(error){showToast('✗ '+(error.message.includes('duplicate')?'Code already exists':error.message));return;}
+    showToast(`✓ Code ${code} created!`);
+    ['newCode','newValue'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('newMinOrder').value='0';
+    document.getElementById('newMinItems').value='0';
+    document.getElementById('newMaxUses').value='9999';
+    loadDiscounts();
+  }
+
+  async function toggleCode(code,active){
+    await db.from('discount_codes').update({active}).eq('code',code);
+    showToast(`✓ ${code} ${active?'enabled':'disabled'}`);
+    loadDiscounts();
+  }
+  async function deleteCode(code){
+    if(!confirm(`Delete "${code}"? Cannot be undone.`)) return;
+    await db.from('discount_codes').delete().eq('code',code);
+    showToast(`✓ Code ${code} deleted`);
+    loadDiscounts();
+  }
+
+  // ══ TOAST ══
+  let toastT;
+  function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),3200);}
+</script>
+</body>
+</html>
